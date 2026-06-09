@@ -1,0 +1,287 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Microsoft JhengHei", Arial, sans-serif;
+  background: #f3f5f7;
+  color: #111;
+}
+
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 8px;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 1px;
+}
+
+.filters,
+.section,
+.rank-filter-section {
+  background: white;
+  padding: 8px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.filter-line {
+  display: grid;
+  grid-template-columns: 42px 1fr 80px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.filter-line span {
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+select {
+  width: 100%;
+  height: 34px;
+  padding: 5px 8px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+}
+
+button {
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: #e5e7eb;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.clear-all {
+  width: 100%;
+  margin-top: 2px;
+}
+
+.red-x {
+  color: #dc2626;
+  font-weight: 900;
+}
+
+.rank-filter-section h2 {
+  margin-bottom: 7px;
+}
+
+.rank-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+button.active {
+  background: #111827;
+  color: white;
+}
+
+h2 {
+  margin: 0 0 7px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.top-combos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.combo-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  padding: 4px;
+  background: #fafafa;
+  text-align: center;
+  min-height: 44px;
+}
+
+.combo-name {
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.combo-combo {
+  font-size: 16px;
+  font-weight: 900;
+  margin-top: 2px;
+  color: #b91c1c;
+}
+
+.combo-sub {
+  color: #4b5563;
+  margin-top: 1px;
+  font-size: 11px;
+  line-height: 1.05;
+}
+
+.popular-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 0;
+}
+
+.popular-block {
+  padding: 0 8px;
+  border-right: 1px solid #d1d5db;
+}
+
+.popular-block:last-child {
+  border-right: 0;
+}
+
+.popular-grid h3 {
+  margin: 0 0 5px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.popular-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 5px;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.popular-item span:first-child {
+  color: #0f2a5f;
+}
+
+.popular-item span:last-child {
+  color: #8aa0c7;
+  font-weight: 800;
+}
+
+.popular-item.clickable {
+  cursor: pointer;
+}
+
+.popular-item.clickable:active {
+  background: #eef2ff;
+}
+
+.list-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.list-header h2 {
+  grid-column: 2;
+  margin: 0;
+}
+
+.result-count {
+  grid-column: 3;
+  justify-self: end;
+  color: #666;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  font-size: 12px;
+}
+
+th,
+td {
+  padding: 6px 4px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: center;
+  white-space: nowrap;
+}
+
+th {
+  background: #f9fafb;
+}
+
+.combo-green {
+  color: #166534;
+  font-weight: 900;
+}
+
+.date-cell {
+  text-align: right !important;
+  color: #777;
+  font-size: 11px;
+}
+
+.rank-gold {
+  background: #fffbea;
+}
+
+@media (max-width: 420px) {
+  .popular-block {
+    padding: 0 5px;
+  }
+
+  .popular-item {
+    font-size: 11px;
+  }
+
+  .combo-combo {
+    font-size: 15px;
+  }
+}
+
+
+.filter-x {
+  color: #dc2626;
+  cursor: pointer;
+  font-weight: 900;
+  margin-left: 4px;
+}
+
+.filter-x:hover {
+  opacity: 0.7;
+}
+
+
+
+.popular-clear{
+  color:#dc2626;
+  cursor:pointer;
+  font-weight:900;
+  margin-left:4px;
+}
+
+.popular-clear:hover{
+  opacity:.7;
+}

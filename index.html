@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>阿杰搭陀螺</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <h1>阿杰搭陀螺</h1>
+    </header>
+
+    <section class="filters">
+      <div class="filter-line">
+        <span>上蓋</span>
+        <select id="bladeSelect"></select>
+        <button id="clearBlade">清除 <span class="red-x">✕</span></button>
+      </div>
+
+      <div class="filter-line">
+        <span>固鎖</span>
+        <select id="ratchetSelect"></select>
+        <button id="clearRatchet">清除 <span class="red-x">✕</span></button>
+      </div>
+
+      <div class="filter-line">
+        <span>軸心</span>
+        <select id="bitSelect"></select>
+        <button id="clearBit">清除 <span class="red-x">✕</span></button>
+      </div>
+
+      <button class="clear-all" id="clearBtn">全部清除</button>
+    </section>
+
+    <section class="section">
+    <h2 id="topComboTitle">熱門得獎組合</h2>
+      <div id="topCombos" class="top-combos"></div>
+    </section>
+
+    <section class="section">
+      <h2>熱門搭配</h2>
+      <div class="popular-grid">
+        <div class="popular-block">
+          <h3>上蓋</h3>
+          <div id="popularBlades"></div>
+        </div>
+
+        <div class="popular-block">
+          <h3>固鎖</h3>
+          <div id="popularRatchets"></div>
+        </div>
+
+        <div class="popular-block">
+          <h3>軸心</h3>
+          <div id="popularBits"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rank-filter-section">
+      <h2>名次篩選</h2>
+      <div class="rank-buttons">
+        <button data-rank="1st">🏆 1st</button>
+        <button data-rank="2nd">2nd</button>
+        <button data-rank="3rd">3rd</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="list-header">
+        <h2>得獎清單</h2>
+        <div id="resultCount" class="result-count"></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>名次</th>
+              <th>中文蓋名</th>
+              <th>搭配</th>
+              <th>日期</th>
+            </tr>
+          </thead>
+          <tbody id="resultTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
