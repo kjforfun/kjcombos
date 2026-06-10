@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Deck</title>
+  <link rel="stylesheet" href="deck.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>My Deck</h1>
+      <p>選三隻陀螺，零件不可重複</p>
+    </header>
+
+    <section class="panel">
+      <div id="deckForms"></div>
+
+      <div class="actions">
+        <button id="generateBtn" class="primary">產出 My Deck</button>
+        <button id="clearBtn">清除全部</button>
+      </div>
+
+      <div id="message" class="message"></div>
+    </section>
+
+    <section id="outputSection" class="output-section hidden">
+      <h2>我的陀螺 COMBO 清單</h2>
+      <div id="deckOutput"></div>
+    </section>
+  </div>
+
+  <script src="deck.js"></script>
+</body>
+</html>
