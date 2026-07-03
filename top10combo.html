@@ -10,7 +10,7 @@
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
       background: #f6f7f8;
-      color: #111;
+      color: #050505;
     }
     .wrap {
       max-width: 720px;
@@ -19,9 +19,9 @@
     }
     .filters {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 7px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       position: sticky;
       top: 0;
       z-index: 5;
@@ -30,7 +30,7 @@
     }
     .filter {
       display: grid;
-      grid-template-columns: 1fr 28px;
+      grid-template-columns: minmax(0, 1fr) 28px;
       gap: 4px;
       align-items: center;
       min-width: 0;
@@ -43,7 +43,7 @@
       border-radius: 8px;
       background: #fff;
       font-size: 13px;
-      font-weight: 650;
+      font-weight: 700;
       min-width: 0;
     }
     .clear {
@@ -57,13 +57,16 @@
       cursor: pointer;
     }
     .clear:disabled {
-      opacity: .23;
+      opacity: .22;
       cursor: default;
     }
-    .list { display: grid; gap: 5px; }
+    .list {
+      display: grid;
+      gap: 5px;
+    }
     .row {
       display: grid;
-      grid-template-columns: 36px minmax(0, 1fr) 58px;
+      grid-template-columns: 34px minmax(0, 1fr) 58px;
       align-items: center;
       gap: 8px;
       min-height: 39px;
@@ -80,13 +83,13 @@
       font-weight: 850;
     }
     .combo {
-      width: min(100%, 430px);
+      width: min(100%, 420px);
       margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 86px;
-      gap: 14px;
+      grid-template-columns: minmax(7em, 1fr) 90px;
+      gap: 16px;
       align-items: baseline;
-      font-weight: 800;
+      font-weight: 850;
       min-width: 0;
     }
     .blade-name {
@@ -100,7 +103,7 @@
       white-space: nowrap;
       text-align: left;
       font-variant-numeric: tabular-nums;
-      letter-spacing: .2px;
+      letter-spacing: .15px;
     }
     .stats {
       white-space: nowrap;
@@ -108,7 +111,10 @@
       font-weight: 850;
       font-variant-numeric: tabular-nums;
     }
-    .hit { color: #d80000; font-weight: 950; }
+    .hit {
+      color: #d00000;
+      font-weight: 950;
+    }
     .empty, .error {
       padding: 12px;
       border-radius: 9px;
@@ -118,10 +124,11 @@
     }
     .empty { border: 1px dashed #aaa; color: #555; }
     .error { border: 1px solid #e29; color: #a00038; font-weight: 750; }
+
     @media (max-width: 520px) {
       .wrap { padding: 7px 5px 18px; }
       .filters { gap: 4px; }
-      .filter { grid-template-columns: 1fr 24px; gap: 2px; }
+      .filter { grid-template-columns: minmax(0, 1fr) 24px; gap: 2px; }
       select { height: 34px; padding: 0 3px; font-size: 11px; border-radius: 7px; }
       .clear { width: 24px; height: 34px; font-size: 16px; border-radius: 7px; }
       .row {
@@ -132,8 +139,8 @@
         font-size: 13px;
       }
       .combo {
-        width: min(100%, 300px);
-        grid-template-columns: minmax(0, 1fr) 68px;
+        width: min(100%, 292px);
+        grid-template-columns: minmax(7em, 1fr) 72px;
         gap: 8px;
       }
       .stats { font-size: 12px; }
@@ -160,6 +167,7 @@
   </main>
 
   <script>
+    // v4: reads ./data.json, strips product model codes from blade names, highlights selected filters.
     let rawData = [];
 
     const fields = {
@@ -177,23 +185,30 @@
     }
 
     function clean(value) {
-      return String(value ?? "").trim();
+      return String(value ?? "")
+        .replace(/\u00a0/g, " ")
+        .replace(/[　]+/g, " ")
+        .trim();
     }
 
-    function stripProductCode(value) {
-      return clean(value)
-        .replace(/[\s　]+(?:BXA|BXB|BXC|BXG|BXH|BX|UX|CX)-\d+[A-Za-z0-9_₀₁₂₃₄₅₆₇₈₉]*/gi, "")
-        .replace(/[\s　]{2,}/g, " ")
-        .trim();
+    function cleanBlade(value) {
+      let s = clean(value);
+
+      // Remove product model codes like BX-34, UX-03, CX-08₁, BXG-57, BXH-22, BXC-19, BXA-06.
+      // Example: 蒼穹龍騎士 BX-34 -> 蒼穹龍騎士
+      s = s.replace(/\s*(?:BXA|BXB|BXC|BXG|BXH|BXK|BXR|BXP|BX|UX|CX)-\d+(?:[-_./]?\d+)?[A-Za-z₀₁₂₃₄₅₆₇₈₉⁰¹²³⁴⁵⁶⁷⁸⁹]*/gi, "");
+
+      // Also remove model code in brackets if the source ever has that format.
+      s = s.replace(/[（(]\s*(?:BXA|BXB|BXC|BXG|BXH|BX|UX|CX)-\d+[^）)]*[）)]/gi, "");
+
+      return s.replace(/\s{2,}/g, " ").trim();
     }
 
     function getFieldValue(row, fieldId) {
       const f = fields[fieldId];
-      const main = clean(row[f.key]);
-      let value = main;
+      let value = clean(row[f.key]);
       if (!value && f.fallbackKey) value = clean(row[f.fallbackKey]);
-      if (fieldId === "blade") return stripProductCode(value);
-      return value;
+      return fieldId === "blade" ? cleanBlade(value) : value;
     }
 
     function isChampion(row) {
@@ -204,7 +219,7 @@
     function dateValue(text) {
       const s = clean(text);
       if (!s) return 0;
-      const parts = s.split(/[\/\-\.]/).map(Number);
+      const parts = s.split(/[\/\-.]/).map(Number);
       if (parts.length < 3 || parts.some(Number.isNaN)) return 0;
       return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
     }
@@ -218,10 +233,11 @@
     }
 
     function rowMatches(row, state, ignoreField = null) {
-      return Object.keys(fields).every(fieldId => {
-        if (fieldId === ignoreField) return true;
-        return !state[fieldId] || getFieldValue(row, fieldId) === state[fieldId];
-      });
+      for (const fieldId of Object.keys(fields)) {
+        if (fieldId === ignoreField) continue;
+        if (state[fieldId] && getFieldValue(row, fieldId) !== state[fieldId]) return false;
+      }
+      return true;
     }
 
     function countOptions(fieldId, state) {
@@ -259,11 +275,11 @@
     }
 
     function updateFilters() {
-      let state = getState();
+      const state = getState();
       let changed = true;
       let guard = 0;
 
-      while (changed && guard < 10) {
+      while (changed && guard < 12) {
         changed = false;
         guard++;
         for (const fieldId of Object.keys(fields)) {
@@ -289,29 +305,22 @@
       return [getFieldValue(row, "blade"), getFieldValue(row, "ratchet"), getFieldValue(row, "bit")].join("||");
     }
 
-    function comboText(row) {
-      const blade = getFieldValue(row, "blade") || "未命名";
-      const ratchet = getFieldValue(row, "ratchet");
-      const bit = getFieldValue(row, "bit");
-      return `${blade} ${ratchet}${bit}`.trim();
+    function comboName(row) {
+      return `${getFieldValue(row, "blade")} ${getFieldValue(row, "ratchet")}${getFieldValue(row, "bit")}`;
     }
 
-    function highlightedSpan(value, active) {
-      const cls = active ? " class=\"hit\"" : "";
-      return `<span${cls}>${esc(value)}</span>`;
+    function hitSpan(value, active) {
+      return `<span${active ? " class=\"hit\"" : ""}>${esc(value)}</span>`;
     }
 
     function comboHtml(row, state) {
       const blade = getFieldValue(row, "blade") || "未命名";
       const ratchet = getFieldValue(row, "ratchet");
       const bit = getFieldValue(row, "bit");
-      const bladeHit = state.blade && blade === state.blade;
-      const ratchetHit = state.ratchet && ratchet === state.ratchet;
-      const bitHit = state.bit && bit === state.bit;
 
       return `
-        <div class="blade-name">${highlightedSpan(blade, bladeHit)}</div>
-        <div class="part-code">${highlightedSpan(ratchet, ratchetHit)}${highlightedSpan(bit, bitHit)}</div>
+        <div class="blade-name">${hitSpan(blade, !!state.blade && blade === state.blade)}</div>
+        <div class="part-code">${hitSpan(ratchet, !!state.ratchet && ratchet === state.ratchet)}${hitSpan(bit, !!state.bit && bit === state.bit)}</div>
       `;
     }
 
@@ -319,9 +328,12 @@
       const map = new Map();
 
       for (const row of rows) {
-        const key = comboKey(row);
-        if (!key.replace(/\|/g, "")) continue;
+        const blade = getFieldValue(row, "blade");
+        const ratchet = getFieldValue(row, "ratchet");
+        const bit = getFieldValue(row, "bit");
+        if (!blade || !ratchet || !bit) continue;
 
+        const key = comboKey(row);
         if (!map.has(key)) {
           map.set(key, { sample: row, total: 0, first: 0, latest: 0 });
         }
@@ -336,7 +348,7 @@
         (b.total - a.total) ||
         (b.first - a.first) ||
         (b.latest - a.latest) ||
-        comboText(a.sample).localeCompare(comboText(b.sample), "zh-Hant", { numeric: true })
+        comboName(a.sample).localeCompare(comboName(b.sample), "zh-Hant", { numeric: true })
       ).slice(0, 10);
     }
 
@@ -364,9 +376,7 @@
     }
 
     function initEmptyFilters() {
-      for (const fieldId of Object.keys(fields)) {
-        setSelectOptions(fieldId, [], "");
-      }
+      for (const fieldId of Object.keys(fields)) setSelectOptions(fieldId, [], "");
     }
 
     async function loadData() {
@@ -387,13 +397,13 @@
       }
     }
 
-    Object.entries(fields).forEach(([fieldId, f]) => {
+    for (const [fieldId, f] of Object.entries(fields)) {
       f.select.addEventListener("change", update);
       f.clear.addEventListener("click", () => {
         f.select.value = "";
         update();
       });
-    });
+    }
 
     loadData();
   </script>
