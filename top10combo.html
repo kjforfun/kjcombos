@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Best 10 Combos</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+      background: #f6f7f8;
+      color: #111;
+    }
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 10px 8px 24px;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: #f6f7f8;
+      padding: 6px 0 8px;
+    }
+    .filter {
+      display: grid;
+      grid-template-columns: 1fr 30px;
+      gap: 4px;
+      align-items: center;
+    }
+    select {
+      width: 100%;
+      height: 36px;
+      padding: 0 6px;
+      border: 1px solid #cfd4dc;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 13px;
+      min-width: 0;
+    }
+    .clear {
+      width: 30px;
+      height: 36px;
+      border: 1px solid #cfd4dc;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .clear:disabled {
+      opacity: .25;
+      cursor: default;
+    }
+    .list { display: grid; gap: 5px; }
+    .row {
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      align-items: center;
+      gap: 7px;
+      min-height: 38px;
+      padding: 7px 9px;
+      border: 1px solid #e1e6ed;
+      border-radius: 9px;
+      background: #fff;
+      font-size: 15px;
+      line-height: 1.15;
+    }
+    .rank {
+      text-align: right;
+      font-weight: 800;
+    }
+    .combo {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+    .stats {
+      white-space: nowrap;
+      font-weight: 800;
+    }
+    .empty {
+      padding: 12px;
+      border: 1px dashed #aaa;
+      border-radius: 9px;
+      background: #fff;
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+    }
+    @media (max-width: 520px) {
+      .wrap { padding: 6px 5px 18px; }
+      .filters { gap: 4px; }
+      .filter { grid-template-columns: 1fr 24px; gap: 2px; }
+      select { height: 34px; padding: 0 3px; font-size: 11px; border-radius: 7px; }
+      .clear { width: 24px; height: 34px; font-size: 16px; border-radius: 7px; }
+      .row { grid-template-columns: 24px 1fr auto; gap: 5px; min-height: 36px; padding: 6px 6px; font-size: 13px; }
+      .stats { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="filters">
+      <div class="filter">
+        <select id="bladeSelect" aria-label="上蓋"></select>
+        <button class="clear" id="clearBlade" title="清除上蓋">×</button>
+      </div>
+      <div class="filter">
+        <select id="ratchetSelect" aria-label="固鎖"></select>
+        <button class="clear" id="clearRatchet" title="清除固鎖">×</button>
+      </div>
+      <div class="filter">
+        <select id="bitSelect" aria-label="軸心"></select>
+        <button class="clear" id="clearBit" title="清除軸心">×</button>
+      </div>
+    </div>
+    <div id="list" class="list"></div>
+  </main>
+
+  <script>
+    const rawData = [
+  {
+    "英文": "CobaltDragoon",
+    "上蓋": "蒼穹龍騎士",
+    "固鎖": "7-60",
+    "軸": "E",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "PhoenixWing",
+    "上蓋": "鳳凰",
+    "固鎖": "3-70",
+    "軸": "F",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "CobaltDragoon",
+    "上蓋": "蒼穹龍騎士",
+    "固鎖": "9-60",
+    "軸": "P",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "PhoenixWing",
+    "上蓋": "鳳凰",
+    "固鎖": "3-60",
+    "軸": "C",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "SharkScale",
+    "上蓋": "鯊魚",
+    "固鎖": "1-50",
+    "軸": "R",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "WizardRod",
+    "上蓋": "神杖",
+    "固鎖": "1-60",
+    "軸": "H",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "DranBuster",
+    "上蓋": "飛龍破壞者",
+    "固鎖": "3-70",
+    "軸": "R",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "GolemRock",
+    "上蓋": "石頭人",
+    "固鎖": "5-70",
+    "軸": "UN",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "SilverWolf",
+    "上蓋": "銀狼",
+    "固鎖": "7-60",
+    "軸": "FB",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "WizardRod",
+    "上蓋": "神杖",
+    "固鎖": "1-60",
+    "軸": "H",
+    "名次": "1st",
+    "日期": "2026/5/26"
+  },
+  {
+    "英文": "SharkScale",
+    "上蓋": "鯊魚",
+    "固鎖": "1-70",
+    "軸": "LR",
+    "名次": "1st",
+    "日期": "2026/5/16"
+  },
+  {
+    "英文": "WizardRod",
+    "上蓋": "神杖",
+    "固鎖": "1-60",
+    "軸": "H",
+    "名次": "1st",
+    "日期": "2026/5/16"
+  },
+  {
+    "英文": "ScorpioSpear",
+    "上蓋": "天蠍長槍",
+    "固鎖": "9-60",
+    "軸": "FB",
+    "名次": "1st",
+    "日期": "2026/5/16"
+  }
+];
+
+    const fields = {
+      blade: { key: "上蓋", label: "上蓋", select: document.getElementById("bladeSelect"), clear: document.getElementById("clearBlade") },
+      ratchet: { key: "固鎖", label: "固鎖", select: document.getElementById("ratchetSelect"), clear: document.getElementById("clearRatchet") },
+      bit: { key: "軸", label: "軸心", select: document.getElementById("bitSelect"), clear: document.getElementById("clearBit") }
+    };
+    const listEl = document.getElementById("list");
+
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+
+    function dateValue(text) {
+      if (!text) return 0;
+      const parts = String(text).split(/[\/\-]/).map(Number);
+      if (parts.length < 3) return 0;
+      return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+    }
+
+    function getState() {
+      return {
+        blade: fields.blade.select.value,
+        ratchet: fields.ratchet.select.value,
+        bit: fields.bit.select.value
+      };
+    }
+
+    function rowMatches(row, state, ignoreField = null) {
+      return Object.entries(fields).every(([id, f]) =>
+        id === ignoreField || !state[id] || row[f.key] === state[id]
+      );
+    }
+
+    function countOptions(fieldId, state) {
+      const f = fields[fieldId];
+      const counts = new Map();
+      for (const row of rawData) {
+        if (!rowMatches(row, state, fieldId)) continue;
+        const value = row[f.key];
+        if (!value) continue;
+        counts.set(value, (counts.get(value) || 0) + 1);
+      }
+      return [...counts.entries()].sort((a, b) =>
+        (b[1] - a[1]) || String(a[0]).localeCompare(String(b[0]), "zh-Hant", { numeric: true })
+      );
+    }
+
+    function setSelectOptions(fieldId, options, selectedValue) {
+      const f = fields[fieldId];
+      const select = f.select;
+      select.innerHTML = "";
+
+      const all = document.createElement("option");
+      all.value = "";
+      all.textContent = `${f.label}：全部`;
+      select.appendChild(all);
+
+      for (const [value, count] of options) {
+        const opt = document.createElement("option");
+        opt.value = value;
+        opt.textContent = `${value} (${count})`;
+        select.appendChild(opt);
+      }
+      select.value = selectedValue;
+      f.clear.disabled = !selectedValue;
+    }
+
+    function updateFilters() {
+      let state = getState();
+      let changed = true;
+      let guard = 0;
+
+      while (changed && guard < 10) {
+        changed = false;
+        guard++;
+        for (const fieldId of Object.keys(fields)) {
+          const options = countOptions(fieldId, state);
+          const values = new Set(options.map(([value]) => value));
+          if (state[fieldId] && !values.has(state[fieldId])) {
+            state[fieldId] = "";
+            changed = true;
+          }
+        }
+      }
+
+      for (const fieldId of Object.keys(fields)) {
+        setSelectOptions(fieldId, countOptions(fieldId, state), state[fieldId]);
+      }
+    }
+
+    function filteredRows() {
+      const state = getState();
+      return rawData.filter(row => rowMatches(row, state));
+    }
+
+    function comboKey(row) {
+      return [row["英文"] || "", row["上蓋"] || "", row["固鎖"] || "", row["軸"] || ""].join("||");
+    }
+
+    function comboText(row) {
+      const blade = row["上蓋"] || row["英文"] || "未命名";
+      return `${blade} ${row["固鎖"] || ""}${row["軸"] || ""}`.trim();
+    }
+
+    function buildTop10(rows) {
+      const map = new Map();
+      for (const row of rows) {
+        const key = comboKey(row);
+        if (!map.has(key)) {
+          map.set(key, { sample: row, total: 0, first: 0, latest: 0 });
+        }
+        const item = map.get(key);
+        item.total += 1;
+        if (row["名次"] === "1st") item.first += 1;
+        item.latest = Math.max(item.latest, dateValue(row["日期"]));
+      }
+      return [...map.values()].sort((a, b) =>
+        (b.total - a.total) ||
+        (b.first - a.first) ||
+        (b.latest - a.latest) ||
+        comboText(a.sample).localeCompare(comboText(b.sample), "zh-Hant", { numeric: true })
+      ).slice(0, 10);
+    }
+
+    function renderList() {
+      const top = buildTop10(filteredRows());
+      if (!top.length) {
+        listEl.innerHTML = `<div class="empty">沒有符合條件</div>`;
+        return;
+      }
+      listEl.innerHTML = top.map((item, index) => `
+        <div class="row">
+          <div class="rank">${index + 1}.</div>
+          <div class="combo">${esc(comboText(item.sample))}</div>
+          <div class="stats">🏆${item.first}/${item.total}</div>
+        </div>
+      `).join("");
+    }
+
+    function update() {
+      updateFilters();
+      renderList();
+    }
+
+    Object.entries(fields).forEach(([fieldId, f]) => {
+      f.select.addEventListener("change", update);
+      f.clear.addEventListener("click", () => {
+        f.select.value = "";
+        update();
+      });
+    });
+
+    update();
+  </script>
+</body>
+</html>
