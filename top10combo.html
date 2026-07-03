@@ -1,425 +1,408 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Top 10 Combo</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Beyblade X Top 10 Combo</title>
+  <!-- top10combo fixed: 2026-07-03 v6 -->
   <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --line: #d9e1ec;
+      --text: #111827;
+      --muted: #6b7280;
+      --red: #d11a2a;
+    }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      background: #f6f7f8;
-      color: #070707;
+      padding: 18px 12px 28px;
+      background: var(--bg);
+      color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+      font-size: 16px;
     }
+
     .wrap {
-      max-width: 720px;
+      width: min(680px, 100%);
       margin: 0 auto;
-      padding: 8px 8px 24px;
     }
+
     .filters {
-      position: sticky;
-      top: 0;
-      z-index: 10;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6px;
-      padding: 6px 0 10px;
-      background: #f6f7f8;
+      gap: 10px;
+      margin-bottom: 16px;
     }
-    .filter {
+
+    .filter-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 30px;
-      gap: 4px;
-      min-width: 0;
+      grid-template-columns: 48px minmax(0, 1fr) 38px;
+      align-items: center;
+      gap: 8px;
     }
+
+    .filter-row label {
+      font-weight: 800;
+      text-align: right;
+      white-space: nowrap;
+    }
+
     select {
       width: 100%;
-      height: 36px;
-      padding: 0 8px;
-      border: 1px solid #ccd3dd;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid #cbd5e1;
       border-radius: 8px;
-      background: #fff;
-      color: #111;
-      font-size: 13px;
-      font-weight: 750;
-      min-width: 0;
+      background: white;
+      color: #111827;
+      font-size: 15px;
+      font-weight: 700;
+      outline: none;
     }
-    .clear {
-      width: 30px;
+
+    .clear-btn {
+      width: 36px;
       height: 36px;
-      border: 1px solid #d8dde5;
-      border-radius: 8px;
-      background: #fff;
-      color: #111;
-      font-size: 19px;
+      border: 1px solid #e5e7eb;
+      border-radius: 9px;
+      background: white;
+      color: #111827;
+      font-size: 20px;
       line-height: 1;
       cursor: pointer;
     }
-    .clear:disabled {
-      opacity: .22;
+
+    .clear-btn:disabled {
+      color: #d1d5db;
+      background: #f8fafc;
       cursor: default;
     }
+
     .list {
       display: grid;
-      gap: 5px;
+      gap: 7px;
     }
-    .row {
+
+    .combo-row {
       display: grid;
-      grid-template-columns: 36px minmax(0, 1fr) 72px;
+      grid-template-columns: 42px minmax(120px, 1fr) 90px 132px;
       align-items: center;
-      min-height: 40px;
-      padding: 7px 10px;
-      border: 1px solid #e0e5ec;
+      min-height: 42px;
+      padding: 8px 10px;
+      background: var(--card);
+      border: 1px solid var(--line);
       border-radius: 9px;
-      background: #fff;
-      font-size: 15px;
-      line-height: 1.15;
+      font-weight: 800;
     }
+
     .rank {
       text-align: right;
-      font-weight: 850;
-      font-variant-numeric: tabular-nums;
-      padding-right: 2px;
+      padding-right: 8px;
+      color: #000;
     }
-    .combo {
-      width: min(100%, 390px);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: minmax(8em, 1fr) 88px;
-      gap: 18px;
-      align-items: baseline;
-      font-weight: 850;
-      min-width: 0;
-    }
+
     .blade {
+      text-align: center;
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      text-align: right;
     }
-    .parts {
-      white-space: nowrap;
-      text-align: left;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: .15px;
-    }
-    .stats {
-      white-space: nowrap;
-      text-align: right;
-      font-weight: 850;
-      font-variant-numeric: tabular-nums;
-    }
-    .hit {
-      color: #d00000;
-      font-weight: 950;
-    }
-    .empty, .error {
-      margin-top: 6px;
-      padding: 14px;
-      border-radius: 9px;
-      background: #fff;
+
+    .combo {
       text-align: center;
-      font-size: 14px;
+      letter-spacing: .2px;
+      white-space: nowrap;
     }
-    .empty { border: 1px dashed #aaa; color: #555; }
-    .error { border: 1px solid #e29; color: #a00038; font-weight: 750; }
+
+    .stat {
+      text-align: center;
+      white-space: nowrap;
+      font-size: 15px;
+    }
+
+    .selected-term {
+      color: var(--red);
+    }
+
+    .empty, .loading, .error {
+      text-align: center;
+      color: var(--muted);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 16px;
+      font-weight: 700;
+    }
+
+    .error { color: var(--red); }
 
     @media (max-width: 520px) {
-      .wrap { padding: 6px 4px 18px; }
-      .filters { gap: 3px; }
-      .filter { grid-template-columns: minmax(0, 1fr) 24px; gap: 2px; }
-      select { height: 34px; padding: 0 3px; font-size: 11px; border-radius: 7px; }
-      .clear { width: 24px; height: 34px; font-size: 16px; border-radius: 7px; }
-      .row {
-        grid-template-columns: 28px minmax(0, 1fr) 54px;
-        min-height: 37px;
-        padding: 6px 6px;
-        font-size: 13px;
+      body { padding: 12px 8px 22px; font-size: 15px; }
+      .wrap { width: 100%; }
+      .filter-row { grid-template-columns: 44px minmax(0, 1fr) 34px; gap: 7px; }
+      .filter-row label { font-size: 15px; }
+      select { height: 38px; font-size: 14px; padding: 0 8px; }
+      .clear-btn { width: 33px; height: 33px; font-size: 19px; }
+
+      .combo-row {
+        grid-template-columns: 32px minmax(84px, 1fr) 76px 108px;
+        min-height: 40px;
+        padding: 7px 6px;
+        column-gap: 2px;
+        font-size: 14px;
       }
-      .combo {
-        width: min(100%, 286px);
-        grid-template-columns: minmax(7em, 1fr) 76px;
-        gap: 8px;
-      }
-      .stats { font-size: 12px; }
+
+      .rank { padding-right: 4px; }
+      .blade { text-align: center; }
+      .combo { text-align: center; }
+      .stat { font-size: 13px; text-align: center; }
     }
   </style>
 </head>
 <body>
   <main class="wrap">
-    <div class="filters">
-      <div class="filter">
-        <select id="bladeSelect" aria-label="上蓋"></select>
-        <button class="clear" id="clearBlade" title="清除上蓋">×</button>
+    <section class="filters" aria-label="篩選條件">
+      <div class="filter-row">
+        <label for="bladeSelect">上蓋</label>
+        <select id="bladeSelect"></select>
+        <button class="clear-btn" id="clearBlade" type="button" aria-label="清除上蓋">×</button>
       </div>
-      <div class="filter">
-        <select id="ratchetSelect" aria-label="固鎖"></select>
-        <button class="clear" id="clearRatchet" title="清除固鎖">×</button>
+
+      <div class="filter-row">
+        <label for="ratchetSelect">固鎖</label>
+        <select id="ratchetSelect"></select>
+        <button class="clear-btn" id="clearRatchet" type="button" aria-label="清除固鎖">×</button>
       </div>
-      <div class="filter">
-        <select id="bitSelect" aria-label="軸心"></select>
-        <button class="clear" id="clearBit" title="清除軸心">×</button>
+
+      <div class="filter-row">
+        <label for="bitSelect">軸心</label>
+        <select id="bitSelect"></select>
+        <button class="clear-btn" id="clearBit" type="button" aria-label="清除軸心">×</button>
       </div>
-    </div>
-    <div id="list" class="list"><div class="empty">讀取 data.json...</div></div>
+    </section>
+
+    <section id="results" class="list">
+      <div class="loading">讀取 data.json 中...</div>
+    </section>
   </main>
 
   <script>
-    // top10combo fixed: 2026-07-03 v5
-    // 1) reads same-folder data.json
-    // 2) strips product model codes from blade names, including UX-03 / BX-34 / full-width dash variants
-    // 3) highlights selected blade / ratchet / bit in red
-    // 4) aligned one-row display
+    const DATA_URL = "data.json?v=" + Date.now();
 
-    let rawData = [];
-
-    const fields = {
-      blade: { key: "上蓋", fallbackKey: "英文", label: "上蓋", select: document.getElementById("bladeSelect"), clear: document.getElementById("clearBlade") },
-      ratchet: { key: "固鎖", label: "固鎖", select: document.getElementById("ratchetSelect"), clear: document.getElementById("clearRatchet") },
-      bit: { key: "軸", label: "軸心", select: document.getElementById("bitSelect"), clear: document.getElementById("clearBit") }
+    const state = {
+      blade: "",
+      ratchet: "",
+      bit: ""
     };
 
-    const listEl = document.getElementById("list");
+    let rows = [];
 
-    function esc(value) {
-      return String(value ?? "").replace(/[&<>"']/g, ch => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
-      }[ch]));
-    }
+    const els = {
+      blade: document.getElementById("bladeSelect"),
+      ratchet: document.getElementById("ratchetSelect"),
+      bit: document.getElementById("bitSelect"),
+      clearBlade: document.getElementById("clearBlade"),
+      clearRatchet: document.getElementById("clearRatchet"),
+      clearBit: document.getElementById("clearBit"),
+      results: document.getElementById("results")
+    };
 
-    function clean(value) {
+    function escapeHtml(value) {
       return String(value ?? "")
-        .replace(/\u00a0/g, " ")
-        .replace(/[　]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    function cleanBlade(value) {
-      let s = clean(value);
-
-      // Remove product code and anything after it when it appears after the blade name.
-      // Examples:
-      // 蒼穹龍騎士 BX-34 -> 蒼穹龍騎士
-      // 魔導神杖 UX-03 -> 魔導神杖
-      // CX-08₁ / BXG-57 / BXH-22 / BXC-19 / BXA-06 also handled.
-      const modelTail = /\s+(?:BXA|BXB|BXC|BXG|BXH|BXK|BXR|BXP|BX|UX|CX)\s*[-‐‑‒–—―－ー]\s*\d+.*$/i;
-      s = s.replace(modelTail, "");
-
-      // Remove standalone model codes anywhere else, including full-width dash variants.
-      const modelAnywhere = /(?:^|\s|[（(])(?:BXA|BXB|BXC|BXG|BXH|BXK|BXR|BXP|BX|UX|CX)\s*[-‐‑‒–—―－ー]\s*\d+(?:\s*[-_./‐‑‒–—―－ー]?\s*\d+)?[A-Za-z₀₁₂₃₄₅₆₇₈₉⁰¹²³⁴⁵⁶⁷⁸⁹]*(?=$|\s|[）)])/gi;
-      s = s.replace(modelAnywhere, " ");
-
-      // Remove bracketed model notes if source has them.
-      s = s.replace(/[（(]\s*(?:BXA|BXB|BXC|BXG|BXH|BX|UX|CX)\s*[-‐‑‒–—―－ー]\s*\d+[^）)]*[）)]/gi, " ");
-
-      return clean(s);
+    function normalize(value) {
+      return String(value ?? "").trim();
     }
 
-    function getFieldValue(row, fieldId) {
-      const f = fields[fieldId];
-      let value = clean(row[f.key]);
-      if (!value && f.fallbackKey) value = clean(row[f.fallbackKey]);
-      return fieldId === "blade" ? cleanBlade(value) : value;
+    function cleanBladeName(value) {
+      let s = normalize(value);
+
+      // 去掉尾端產品型號，例如：魔導神杖 UX-03、蒼穹龍騎士 BX-34、翔龍神劍 BXG-53
+      s = s.replace(/\s+(?:BX|UX|CX|BXG|BXH|BXC|BXA|BXK|BXP|BXW)-\d{1,3}(?:[._-]?\d{1,2})?$/i, "");
+
+      // 去掉括號內純型號，例如：魔導神杖 (UX-03)
+      s = s.replace(/\s*[（(](?:BX|UX|CX|BXG|BXH|BXC|BXA|BXK|BXP|BXW)-\d{1,3}(?:[._-]?\d{1,2})?[）)]\s*$/i, "");
+
+      return s.trim();
     }
 
-    function isChampion(row) {
-      const rank = clean(row["名次"]).toLowerCase();
-      return rank === "1st" || rank === "1" || rank === "冠軍" || rank.includes("champion");
+    function isChampion(rank) {
+      const r = normalize(rank).toLowerCase();
+      return r === "1st" || r === "1" || r.includes("冠軍");
     }
 
-    function dateValue(text) {
-      const s = clean(text);
-      if (!s) return 0;
-      const parts = s.split(/[\/\-.]/).map(Number);
-      if (parts.length < 3 || parts.some(Number.isNaN)) return 0;
-      return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+    function parseDateValue(value) {
+      const raw = normalize(value);
+      if (!raw) return 0;
+      const time = Date.parse(raw.replaceAll("/", "-"));
+      return Number.isFinite(time) ? time : 0;
     }
 
-    function getState() {
-      return {
-        blade: fields.blade.select.value,
-        ratchet: fields.ratchet.select.value,
-        bit: fields.bit.select.value
-      };
+    function buildRows(rawData) {
+      return rawData.map((r, index) => {
+        const blade = cleanBladeName(r["上蓋"] || r["blade"] || r["Blade"] || "");
+        const ratchet = normalize(r["固鎖"] || r["ratchet"] || r["Ratchet"] || "");
+        const bit = normalize(r["軸"] || r["軸心"] || r["bit"] || r["Bit"] || "");
+        return {
+          id: index,
+          blade,
+          ratchet,
+          bit,
+          rank: normalize(r["名次"] || r["rank"] || r["Rank"] || ""),
+          dateValue: parseDateValue(r["日期"] || r["date"] || r["Date"] || "")
+        };
+      }).filter(r => r.blade || r.ratchet || r.bit);
     }
 
-    function rowMatches(row, state, ignoreField = null) {
-      for (const fieldId of Object.keys(fields)) {
-        if (fieldId === ignoreField) continue;
-        if (state[fieldId] && getFieldValue(row, fieldId) !== state[fieldId]) return false;
+    function filteredData(exceptField = "") {
+      return rows.filter(r => {
+        if (exceptField !== "blade" && state.blade && r.blade !== state.blade) return false;
+        if (exceptField !== "ratchet" && state.ratchet && r.ratchet !== state.ratchet) return false;
+        if (exceptField !== "bit" && state.bit && r.bit !== state.bit) return false;
+        return true;
+      });
+    }
+
+    function countOptions(field) {
+      const data = filteredData(field);
+      const map = new Map();
+      for (const r of data) {
+        const key = r[field];
+        if (!key) continue;
+        map.set(key, (map.get(key) || 0) + 1);
       }
-      return true;
+      return Array.from(map.entries())
+        .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0]), "zh-Hant"));
     }
 
-    function countOptions(fieldId, state) {
-      const counts = new Map();
-      for (const row of rawData) {
-        if (!rowMatches(row, state, fieldId)) continue;
-        const value = getFieldValue(row, fieldId);
-        if (!value) continue;
-        counts.set(value, (counts.get(value) || 0) + 1);
-      }
-      return [...counts.entries()].sort((a, b) =>
-        (b[1] - a[1]) || String(a[0]).localeCompare(String(b[0]), "zh-Hant", { numeric: true })
-      );
-    }
+    function fillSelect(selectEl, field, label) {
+      const current = state[field];
+      const options = countOptions(field);
+      const valid = !current || options.some(([value]) => value === current);
+      if (!valid) state[field] = "";
 
-    function setSelectOptions(fieldId, options, selectedValue) {
-      const f = fields[fieldId];
-      const select = f.select;
-      select.innerHTML = "";
-
+      selectEl.innerHTML = "";
       const all = document.createElement("option");
       all.value = "";
-      all.textContent = `${f.label}：全部`;
-      select.appendChild(all);
+      all.textContent = `${label}：全部`;
+      selectEl.appendChild(all);
 
       for (const [value, count] of options) {
         const opt = document.createElement("option");
         opt.value = value;
         opt.textContent = `${value} (${count})`;
-        select.appendChild(opt);
+        selectEl.appendChild(opt);
       }
-
-      select.value = selectedValue;
-      f.clear.disabled = !selectedValue;
+      selectEl.value = state[field];
     }
 
-    function updateFilters() {
-      const state = getState();
-      let changed = true;
-      let guard = 0;
+    function updateSelects() {
+      fillSelect(els.blade, "blade", "上蓋");
+      fillSelect(els.ratchet, "ratchet", "固鎖");
+      fillSelect(els.bit, "bit", "軸心");
 
-      while (changed && guard < 12) {
-        changed = false;
-        guard++;
-        for (const fieldId of Object.keys(fields)) {
-          const values = new Set(countOptions(fieldId, state).map(([value]) => value));
-          if (state[fieldId] && !values.has(state[fieldId])) {
-            state[fieldId] = "";
-            changed = true;
-          }
-        }
-      }
-
-      for (const fieldId of Object.keys(fields)) {
-        setSelectOptions(fieldId, countOptions(fieldId, state), state[fieldId]);
-      }
+      els.clearBlade.disabled = !state.blade;
+      els.clearRatchet.disabled = !state.ratchet;
+      els.clearBit.disabled = !state.bit;
     }
 
-    function filteredRows() {
-      const state = getState();
-      return rawData.filter(row => rowMatches(row, state));
+    function getComboText(g) {
+      return `${g.ratchet || ""}${g.bit || ""}`;
     }
 
-    function comboKey(row) {
-      return [getFieldValue(row, "blade"), getFieldValue(row, "ratchet"), getFieldValue(row, "bit")].join("||");
-    }
-
-    function comboSortName(row) {
-      return `${getFieldValue(row, "blade")} ${getFieldValue(row, "ratchet")}${getFieldValue(row, "bit")}`;
-    }
-
-    function hitSpan(value, active) {
-      return `<span${active ? " class=\"hit\"" : ""}>${esc(value)}</span>`;
-    }
-
-    function comboHtml(row, state) {
-      const blade = getFieldValue(row, "blade") || "未命名";
-      const ratchet = getFieldValue(row, "ratchet");
-      const bit = getFieldValue(row, "bit");
-      const bladeActive = !!state.blade && blade === state.blade;
-      const ratchetActive = !!state.ratchet && ratchet === state.ratchet;
-      const bitActive = !!state.bit && bit === state.bit;
-
-      return `
-        <div class="blade">${hitSpan(blade, bladeActive)}</div>
-        <div class="parts">${hitSpan(ratchet, ratchetActive)}${hitSpan(bit, bitActive)}</div>
-      `;
-    }
-
-    function buildTop10(rows) {
+    function groupResults() {
       const map = new Map();
-
-      for (const row of rows) {
-        const blade = getFieldValue(row, "blade");
-        const ratchet = getFieldValue(row, "ratchet");
-        const bit = getFieldValue(row, "bit");
-        if (!blade || !ratchet || !bit) continue;
-
-        const key = comboKey(row);
+      for (const r of filteredData()) {
+        const key = `${r.blade}\u0001${r.ratchet}\u0001${r.bit}`;
         if (!map.has(key)) {
-          map.set(key, { sample: row, total: 0, first: 0, latest: 0 });
+          map.set(key, {
+            blade: r.blade,
+            ratchet: r.ratchet,
+            bit: r.bit,
+            total: 0,
+            champion: 0,
+            latest: 0
+          });
         }
-
-        const item = map.get(key);
-        item.total += 1;
-        if (isChampion(row)) item.first += 1;
-        item.latest = Math.max(item.latest, dateValue(row["日期"]));
+        const g = map.get(key);
+        g.total += 1;
+        if (isChampion(r.rank)) g.champion += 1;
+        if (r.dateValue > g.latest) g.latest = r.dateValue;
       }
-
-      return [...map.values()].sort((a, b) =>
-        (b.total - a.total) ||
-        (b.first - a.first) ||
-        (b.latest - a.latest) ||
-        comboSortName(a.sample).localeCompare(comboSortName(b.sample), "zh-Hant", { numeric: true })
-      ).slice(0, 10);
+      return Array.from(map.values())
+        .sort((a, b) => b.total - a.total || b.champion - a.champion || b.latest - a.latest)
+        .slice(0, 10);
     }
 
-    function renderList() {
-      const state = getState();
-      const top = buildTop10(filteredRows());
+    function renderName(blade) {
+      const cls = state.blade && blade === state.blade ? "selected-term" : "";
+      return `<span class="${cls}">${escapeHtml(blade)}</span>`;
+    }
 
-      if (!top.length) {
-        listEl.innerHTML = `<div class="empty">沒有符合條件</div>`;
+    function renderCombo(g) {
+      const ratchetCls = state.ratchet && g.ratchet === state.ratchet ? "selected-term" : "";
+      const bitCls = state.bit && g.bit === state.bit ? "selected-term" : "";
+      return `<span class="${ratchetCls}">${escapeHtml(g.ratchet)}</span><span class="${bitCls}">${escapeHtml(g.bit)}</span>`;
+    }
+
+    function renderResults() {
+      const groups = groupResults();
+      els.results.innerHTML = "";
+
+      if (groups.length === 0) {
+        els.results.innerHTML = `<div class="empty">沒有符合條件的組合</div>`;
         return;
       }
 
-      listEl.innerHTML = top.map((item, index) => `
-        <div class="row">
+      groups.forEach((g, index) => {
+        const row = document.createElement("div");
+        row.className = "combo-row";
+        row.innerHTML = `
           <div class="rank">${index + 1}.</div>
-          <div class="combo">${comboHtml(item.sample, state)}</div>
-          <div class="stats">🏆${item.first}/${item.total}</div>
-        </div>
-      `).join("");
-    }
-
-    function update() {
-      updateFilters();
-      renderList();
-    }
-
-    function initEmptyFilters() {
-      for (const fieldId of Object.keys(fields)) setSelectOptions(fieldId, [], "");
-    }
-
-    async function loadData() {
-      initEmptyFilters();
-      try {
-        const response = await fetch(`data.json?v=${Date.now()}`, { cache: "no-store" });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        if (!Array.isArray(data)) throw new Error("data.json 不是陣列格式");
-        rawData = data.map(row => ({ ...row }));
-        update();
-      } catch (err) {
-        console.error(err);
-        listEl.innerHTML = `<div class="error">讀不到 data.json。確認 top10combo.html 跟 data.json 在同一層。</div>`;
-      }
-    }
-
-    for (const [fieldId, f] of Object.entries(fields)) {
-      f.select.addEventListener("change", update);
-      f.clear.addEventListener("click", () => {
-        f.select.value = "";
-        update();
+          <div class="blade">${renderName(g.blade)}</div>
+          <div class="combo">${renderCombo(g)}</div>
+          <div class="stat">${g.total}次(冠軍${g.champion}次)</div>
+        `;
+        els.results.appendChild(row);
       });
     }
 
-    loadData();
+    function refresh() {
+      updateSelects();
+      renderResults();
+    }
+
+    els.blade.addEventListener("change", () => { state.blade = els.blade.value; refresh(); });
+    els.ratchet.addEventListener("change", () => { state.ratchet = els.ratchet.value; refresh(); });
+    els.bit.addEventListener("change", () => { state.bit = els.bit.value; refresh(); });
+
+    els.clearBlade.addEventListener("click", () => { state.blade = ""; refresh(); });
+    els.clearRatchet.addEventListener("click", () => { state.ratchet = ""; refresh(); });
+    els.clearBit.addEventListener("click", () => { state.bit = ""; refresh(); });
+
+    fetch(DATA_URL)
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        rows = buildRows(Array.isArray(data) ? data : []);
+        refresh();
+      })
+      .catch(error => {
+        console.error(error);
+        els.results.innerHTML = `<div class="error">讀不到 data.json，請確認 top10combo.html 跟 data.json 放在同一層。</div>`;
+      });
   </script>
 </body>
 </html>
