@@ -10,7 +10,7 @@
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
       background: #f6f7f8;
-      color: #112;
+      color: #111;
     }
     .wrap {
       max-width: 680px;
@@ -33,6 +33,7 @@
       grid-template-columns: 1fr 30px;
       gap: 4px;
       align-items: center;
+      min-width: 0;
     }
     select {
       width: 100%;
@@ -72,10 +73,7 @@
       font-size: 15px;
       line-height: 1.15;
     }
-    .rank {
-      text-align: right;
-      font-weight: 800;
-    }
+    .rank { text-align: right; font-weight: 800; }
     .combo {
       min-width: 0;
       overflow: hidden;
@@ -83,19 +81,16 @@
       white-space: nowrap;
       font-weight: 700;
     }
-    .stats {
-      white-space: nowrap;
-      font-weight: 800;
-    }
-    .empty {
+    .stats { white-space: nowrap; font-weight: 800; }
+    .empty, .error {
       padding: 12px;
-      border: 1px dashed #aaa;
       border-radius: 9px;
       background: #fff;
       text-align: center;
-      color: #555;
       font-size: 14px;
     }
+    .empty { border: 1px dashed #aaa; color: #555; }
+    .error { border: 1px solid #e29; color: #a00038; font-weight: 700; }
     @media (max-width: 520px) {
       .wrap { padding: 6px 5px 18px; }
       .filters { gap: 4px; }
@@ -123,122 +118,18 @@
         <button class="clear" id="clearBit" title="清除軸心">×</button>
       </div>
     </div>
-    <div id="list" class="list"></div>
+    <div id="list" class="list"><div class="empty">讀取 data.json...</div></div>
   </main>
 
   <script>
-    const rawData = [
-  {
-    "英文": "CobaltDragoon",
-    "上蓋": "蒼穹龍騎士",
-    "固鎖": "7-60",
-    "軸": "E",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "PhoenixWing",
-    "上蓋": "鳳凰",
-    "固鎖": "3-70",
-    "軸": "F",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "CobaltDragoon",
-    "上蓋": "蒼穹龍騎士",
-    "固鎖": "9-60",
-    "軸": "P",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "PhoenixWing",
-    "上蓋": "鳳凰",
-    "固鎖": "3-60",
-    "軸": "C",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "SharkScale",
-    "上蓋": "鯊魚",
-    "固鎖": "1-50",
-    "軸": "R",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "WizardRod",
-    "上蓋": "神杖",
-    "固鎖": "1-60",
-    "軸": "H",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "DranBuster",
-    "上蓋": "飛龍破壞者",
-    "固鎖": "3-70",
-    "軸": "R",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "GolemRock",
-    "上蓋": "石頭人",
-    "固鎖": "5-70",
-    "軸": "UN",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "SilverWolf",
-    "上蓋": "銀狼",
-    "固鎖": "7-60",
-    "軸": "FB",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "WizardRod",
-    "上蓋": "神杖",
-    "固鎖": "1-60",
-    "軸": "H",
-    "名次": "1st",
-    "日期": "2026/5/26"
-  },
-  {
-    "英文": "SharkScale",
-    "上蓋": "鯊魚",
-    "固鎖": "1-70",
-    "軸": "LR",
-    "名次": "1st",
-    "日期": "2026/5/16"
-  },
-  {
-    "英文": "WizardRod",
-    "上蓋": "神杖",
-    "固鎖": "1-60",
-    "軸": "H",
-    "名次": "1st",
-    "日期": "2026/5/16"
-  },
-  {
-    "英文": "ScorpioSpear",
-    "上蓋": "天蠍長槍",
-    "固鎖": "9-60",
-    "軸": "FB",
-    "名次": "1st",
-    "日期": "2026/5/16"
-  }
-];
+    let rawData = [];
 
     const fields = {
-      blade: { key: "上蓋", label: "上蓋", select: document.getElementById("bladeSelect"), clear: document.getElementById("clearBlade") },
+      blade: { key: "上蓋", fallbackKey: "英文", label: "上蓋", select: document.getElementById("bladeSelect"), clear: document.getElementById("clearBlade") },
       ratchet: { key: "固鎖", label: "固鎖", select: document.getElementById("ratchetSelect"), clear: document.getElementById("clearRatchet") },
       bit: { key: "軸", label: "軸心", select: document.getElementById("bitSelect"), clear: document.getElementById("clearBit") }
     };
+
     const listEl = document.getElementById("list");
 
     function esc(value) {
@@ -247,10 +138,28 @@
       }[ch]));
     }
 
+    function clean(value) {
+      return String(value ?? "").trim();
+    }
+
+    function getFieldValue(row, fieldId) {
+      const f = fields[fieldId];
+      const main = clean(row[f.key]);
+      if (main) return main;
+      if (f.fallbackKey) return clean(row[f.fallbackKey]);
+      return "";
+    }
+
+    function isChampion(row) {
+      const rank = clean(row["名次"]).toLowerCase();
+      return rank === "1st" || rank === "1" || rank === "冠軍" || rank.includes("champion");
+    }
+
     function dateValue(text) {
-      if (!text) return 0;
-      const parts = String(text).split(/[\/\-]/).map(Number);
-      if (parts.length < 3) return 0;
+      const s = clean(text);
+      if (!s) return 0;
+      const parts = s.split(/[\/\-\.]/).map(Number);
+      if (parts.length < 3 || parts.some(Number.isNaN)) return 0;
       return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
     }
 
@@ -263,17 +172,17 @@
     }
 
     function rowMatches(row, state, ignoreField = null) {
-      return Object.entries(fields).every(([id, f]) =>
-        id === ignoreField || !state[id] || row[f.key] === state[id]
-      );
+      return Object.keys(fields).every(fieldId => {
+        if (fieldId === ignoreField) return true;
+        return !state[fieldId] || getFieldValue(row, fieldId) === state[fieldId];
+      });
     }
 
     function countOptions(fieldId, state) {
-      const f = fields[fieldId];
       const counts = new Map();
       for (const row of rawData) {
         if (!rowMatches(row, state, fieldId)) continue;
-        const value = row[f.key];
+        const value = getFieldValue(row, fieldId);
         if (!value) continue;
         counts.set(value, (counts.get(value) || 0) + 1);
       }
@@ -298,6 +207,7 @@
         opt.textContent = `${value} (${count})`;
         select.appendChild(opt);
       }
+
       select.value = selectedValue;
       f.clear.disabled = !selectedValue;
     }
@@ -311,8 +221,7 @@
         changed = false;
         guard++;
         for (const fieldId of Object.keys(fields)) {
-          const options = countOptions(fieldId, state);
-          const values = new Set(options.map(([value]) => value));
+          const values = new Set(countOptions(fieldId, state).map(([value]) => value));
           if (state[fieldId] && !values.has(state[fieldId])) {
             state[fieldId] = "";
             changed = true;
@@ -331,26 +240,33 @@
     }
 
     function comboKey(row) {
-      return [row["英文"] || "", row["上蓋"] || "", row["固鎖"] || "", row["軸"] || ""].join("||");
+      return [getFieldValue(row, "blade"), getFieldValue(row, "ratchet"), getFieldValue(row, "bit")].join("||");
     }
 
     function comboText(row) {
-      const blade = row["上蓋"] || row["英文"] || "未命名";
-      return `${blade} ${row["固鎖"] || ""}${row["軸"] || ""}`.trim();
+      const blade = getFieldValue(row, "blade") || "未命名";
+      const ratchet = getFieldValue(row, "ratchet");
+      const bit = getFieldValue(row, "bit");
+      return `${blade} ${ratchet}${bit}`.trim();
     }
 
     function buildTop10(rows) {
       const map = new Map();
+
       for (const row of rows) {
         const key = comboKey(row);
+        if (!key.replace(/\|/g, "")) continue;
+
         if (!map.has(key)) {
           map.set(key, { sample: row, total: 0, first: 0, latest: 0 });
         }
+
         const item = map.get(key);
         item.total += 1;
-        if (row["名次"] === "1st") item.first += 1;
+        if (isChampion(row)) item.first += 1;
         item.latest = Math.max(item.latest, dateValue(row["日期"]));
       }
+
       return [...map.values()].sort((a, b) =>
         (b.total - a.total) ||
         (b.first - a.first) ||
@@ -361,10 +277,12 @@
 
     function renderList() {
       const top = buildTop10(filteredRows());
+
       if (!top.length) {
         listEl.innerHTML = `<div class="empty">沒有符合條件</div>`;
         return;
       }
+
       listEl.innerHTML = top.map((item, index) => `
         <div class="row">
           <div class="rank">${index + 1}.</div>
@@ -379,6 +297,30 @@
       renderList();
     }
 
+    function initEmptyFilters() {
+      for (const fieldId of Object.keys(fields)) {
+        setSelectOptions(fieldId, [], "");
+      }
+    }
+
+    async function loadData() {
+      initEmptyFilters();
+
+      try {
+        const response = await fetch(`data.json?v=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        if (!Array.isArray(data)) throw new Error("data.json 不是陣列格式");
+
+        rawData = data.map(row => ({ ...row }));
+        update();
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = `<div class="error">讀不到 data.json。確認 top10combo.html 跟 data.json 在同一層。</div>`;
+      }
+    }
+
     Object.entries(fields).forEach(([fieldId, f]) => {
       f.select.addEventListener("change", update);
       f.clear.addEventListener("click", () => {
@@ -387,7 +329,7 @@
       });
     });
 
-    update();
+    loadData();
   </script>
 </body>
 </html>
