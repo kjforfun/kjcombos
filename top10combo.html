@@ -1,58 +1,58 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Best 10 Combos</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Top 10 Combo</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
       background: #f6f7f8;
-      color: #050505;
+      color: #070707;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
     }
     .wrap {
       max-width: 720px;
       margin: 0 auto;
-      padding: 12px 10px 24px;
+      padding: 8px 8px 24px;
     }
     .filters {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 7px;
-      margin-bottom: 12px;
       position: sticky;
       top: 0;
-      z-index: 5;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      padding: 6px 0 10px;
       background: #f6f7f8;
-      padding: 6px 0 9px;
     }
     .filter {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 28px;
+      grid-template-columns: minmax(0, 1fr) 30px;
       gap: 4px;
-      align-items: center;
       min-width: 0;
     }
     select {
       width: 100%;
       height: 36px;
       padding: 0 8px;
-      border: 1px solid #cfd4dc;
+      border: 1px solid #ccd3dd;
       border-radius: 8px;
       background: #fff;
+      color: #111;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 750;
       min-width: 0;
     }
     .clear {
-      width: 28px;
+      width: 30px;
       height: 36px;
       border: 1px solid #d8dde5;
       border-radius: 8px;
       background: #fff;
-      font-size: 18px;
+      color: #111;
+      font-size: 19px;
       line-height: 1;
       cursor: pointer;
     }
@@ -66,12 +66,11 @@
     }
     .row {
       display: grid;
-      grid-template-columns: 34px minmax(0, 1fr) 58px;
+      grid-template-columns: 36px minmax(0, 1fr) 72px;
       align-items: center;
-      gap: 8px;
-      min-height: 39px;
+      min-height: 40px;
       padding: 7px 10px;
-      border: 1px solid #e1e6ed;
+      border: 1px solid #e0e5ec;
       border-radius: 9px;
       background: #fff;
       font-size: 15px;
@@ -79,27 +78,28 @@
     }
     .rank {
       text-align: right;
-      font-variant-numeric: tabular-nums;
       font-weight: 850;
+      font-variant-numeric: tabular-nums;
+      padding-right: 2px;
     }
     .combo {
-      width: min(100%, 420px);
+      width: min(100%, 390px);
       margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(7em, 1fr) 90px;
-      gap: 16px;
+      grid-template-columns: minmax(8em, 1fr) 88px;
+      gap: 18px;
       align-items: baseline;
       font-weight: 850;
       min-width: 0;
     }
-    .blade-name {
+    .blade {
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       text-align: right;
     }
-    .part-code {
+    .parts {
       white-space: nowrap;
       text-align: left;
       font-variant-numeric: tabular-nums;
@@ -116,7 +116,8 @@
       font-weight: 950;
     }
     .empty, .error {
-      padding: 12px;
+      margin-top: 6px;
+      padding: 14px;
       border-radius: 9px;
       background: #fff;
       text-align: center;
@@ -126,21 +127,20 @@
     .error { border: 1px solid #e29; color: #a00038; font-weight: 750; }
 
     @media (max-width: 520px) {
-      .wrap { padding: 7px 5px 18px; }
-      .filters { gap: 4px; }
+      .wrap { padding: 6px 4px 18px; }
+      .filters { gap: 3px; }
       .filter { grid-template-columns: minmax(0, 1fr) 24px; gap: 2px; }
       select { height: 34px; padding: 0 3px; font-size: 11px; border-radius: 7px; }
       .clear { width: 24px; height: 34px; font-size: 16px; border-radius: 7px; }
       .row {
-        grid-template-columns: 28px minmax(0, 1fr) 48px;
-        gap: 5px;
-        min-height: 36px;
+        grid-template-columns: 28px minmax(0, 1fr) 54px;
+        min-height: 37px;
         padding: 6px 6px;
         font-size: 13px;
       }
       .combo {
-        width: min(100%, 292px);
-        grid-template-columns: minmax(7em, 1fr) 72px;
+        width: min(100%, 286px);
+        grid-template-columns: minmax(7em, 1fr) 76px;
         gap: 8px;
       }
       .stats { font-size: 12px; }
@@ -167,7 +167,12 @@
   </main>
 
   <script>
-    // v4: reads ./data.json, strips product model codes from blade names, highlights selected filters.
+    // top10combo fixed: 2026-07-03 v5
+    // 1) reads same-folder data.json
+    // 2) strips product model codes from blade names, including UX-03 / BX-34 / full-width dash variants
+    // 3) highlights selected blade / ratchet / bit in red
+    // 4) aligned one-row display
+
     let rawData = [];
 
     const fields = {
@@ -188,20 +193,29 @@
       return String(value ?? "")
         .replace(/\u00a0/g, " ")
         .replace(/[　]+/g, " ")
+        .replace(/\s+/g, " ")
         .trim();
     }
 
     function cleanBlade(value) {
       let s = clean(value);
 
-      // Remove product model codes like BX-34, UX-03, CX-08₁, BXG-57, BXH-22, BXC-19, BXA-06.
-      // Example: 蒼穹龍騎士 BX-34 -> 蒼穹龍騎士
-      s = s.replace(/\s*(?:BXA|BXB|BXC|BXG|BXH|BXK|BXR|BXP|BX|UX|CX)-\d+(?:[-_./]?\d+)?[A-Za-z₀₁₂₃₄₅₆₇₈₉⁰¹²³⁴⁵⁶⁷⁸⁹]*/gi, "");
+      // Remove product code and anything after it when it appears after the blade name.
+      // Examples:
+      // 蒼穹龍騎士 BX-34 -> 蒼穹龍騎士
+      // 魔導神杖 UX-03 -> 魔導神杖
+      // CX-08₁ / BXG-57 / BXH-22 / BXC-19 / BXA-06 also handled.
+      const modelTail = /\s+(?:BXA|BXB|BXC|BXG|BXH|BXK|BXR|BXP|BX|UX|CX)\s*[-‐‑‒–—―－ー]\s*\d+.*$/i;
+      s = s.replace(modelTail, "");
 
-      // Also remove model code in brackets if the source ever has that format.
-      s = s.replace(/[（(]\s*(?:BXA|BXB|BXC|BXG|BXH|BX|UX|CX)-\d+[^）)]*[）)]/gi, "");
+      // Remove standalone model codes anywhere else, including full-width dash variants.
+      const modelAnywhere = /(?:^|\s|[（(])(?:BXA|BXB|BXC|BXG|BXH|BXK|BXR|BXP|BX|UX|CX)\s*[-‐‑‒–—―－ー]\s*\d+(?:\s*[-_./‐‑‒–—―－ー]?\s*\d+)?[A-Za-z₀₁₂₃₄₅₆₇₈₉⁰¹²³⁴⁵⁶⁷⁸⁹]*(?=$|\s|[）)])/gi;
+      s = s.replace(modelAnywhere, " ");
 
-      return s.replace(/\s{2,}/g, " ").trim();
+      // Remove bracketed model notes if source has them.
+      s = s.replace(/[（(]\s*(?:BXA|BXB|BXC|BXG|BXH|BX|UX|CX)\s*[-‐‑‒–—―－ー]\s*\d+[^）)]*[）)]/gi, " ");
+
+      return clean(s);
     }
 
     function getFieldValue(row, fieldId) {
@@ -305,7 +319,7 @@
       return [getFieldValue(row, "blade"), getFieldValue(row, "ratchet"), getFieldValue(row, "bit")].join("||");
     }
 
-    function comboName(row) {
+    function comboSortName(row) {
       return `${getFieldValue(row, "blade")} ${getFieldValue(row, "ratchet")}${getFieldValue(row, "bit")}`;
     }
 
@@ -317,10 +331,13 @@
       const blade = getFieldValue(row, "blade") || "未命名";
       const ratchet = getFieldValue(row, "ratchet");
       const bit = getFieldValue(row, "bit");
+      const bladeActive = !!state.blade && blade === state.blade;
+      const ratchetActive = !!state.ratchet && ratchet === state.ratchet;
+      const bitActive = !!state.bit && bit === state.bit;
 
       return `
-        <div class="blade-name">${hitSpan(blade, !!state.blade && blade === state.blade)}</div>
-        <div class="part-code">${hitSpan(ratchet, !!state.ratchet && ratchet === state.ratchet)}${hitSpan(bit, !!state.bit && bit === state.bit)}</div>
+        <div class="blade">${hitSpan(blade, bladeActive)}</div>
+        <div class="parts">${hitSpan(ratchet, ratchetActive)}${hitSpan(bit, bitActive)}</div>
       `;
     }
 
@@ -348,7 +365,7 @@
         (b.total - a.total) ||
         (b.first - a.first) ||
         (b.latest - a.latest) ||
-        comboName(a.sample).localeCompare(comboName(b.sample), "zh-Hant", { numeric: true })
+        comboSortName(a.sample).localeCompare(comboSortName(b.sample), "zh-Hant", { numeric: true })
       ).slice(0, 10);
     }
 
@@ -381,14 +398,11 @@
 
     async function loadData() {
       initEmptyFilters();
-
       try {
         const response = await fetch(`data.json?v=${Date.now()}`, { cache: "no-store" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
         const data = await response.json();
         if (!Array.isArray(data)) throw new Error("data.json 不是陣列格式");
-
         rawData = data.map(row => ({ ...row }));
         update();
       } catch (err) {
