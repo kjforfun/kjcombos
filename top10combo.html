@@ -13,24 +13,24 @@
       color: #111;
     }
     .wrap {
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto;
-      padding: 10px 8px 24px;
+      padding: 12px 10px 24px;
     }
     .filters {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      margin-bottom: 8px;
+      gap: 7px;
+      margin-bottom: 10px;
       position: sticky;
       top: 0;
       z-index: 5;
       background: #f6f7f8;
-      padding: 6px 0 8px;
+      padding: 6px 0 9px;
     }
     .filter {
       display: grid;
-      grid-template-columns: 1fr 30px;
+      grid-template-columns: 1fr 28px;
       gap: 4px;
       align-items: center;
       min-width: 0;
@@ -38,17 +38,18 @@
     select {
       width: 100%;
       height: 36px;
-      padding: 0 6px;
+      padding: 0 8px;
       border: 1px solid #cfd4dc;
       border-radius: 8px;
       background: #fff;
       font-size: 13px;
+      font-weight: 650;
       min-width: 0;
     }
     .clear {
-      width: 30px;
+      width: 28px;
       height: 36px;
-      border: 1px solid #cfd4dc;
+      border: 1px solid #d8dde5;
       border-radius: 8px;
       background: #fff;
       font-size: 18px;
@@ -56,32 +57,58 @@
       cursor: pointer;
     }
     .clear:disabled {
-      opacity: .25;
+      opacity: .23;
       cursor: default;
     }
     .list { display: grid; gap: 5px; }
     .row {
       display: grid;
-      grid-template-columns: 30px 1fr auto;
+      grid-template-columns: 36px minmax(0, 1fr) 58px;
       align-items: center;
-      gap: 7px;
-      min-height: 38px;
-      padding: 7px 9px;
+      gap: 8px;
+      min-height: 39px;
+      padding: 7px 10px;
       border: 1px solid #e1e6ed;
       border-radius: 9px;
       background: #fff;
       font-size: 15px;
       line-height: 1.15;
     }
-    .rank { text-align: right; font-weight: 800; }
+    .rank {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 850;
+    }
     .combo {
+      width: min(100%, 430px);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 86px;
+      gap: 14px;
+      align-items: baseline;
+      font-weight: 800;
+      min-width: 0;
+    }
+    .blade-name {
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-weight: 700;
+      text-align: right;
     }
-    .stats { white-space: nowrap; font-weight: 800; }
+    .part-code {
+      white-space: nowrap;
+      text-align: left;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .2px;
+    }
+    .stats {
+      white-space: nowrap;
+      text-align: right;
+      font-weight: 850;
+      font-variant-numeric: tabular-nums;
+    }
+    .hit { color: #d80000; font-weight: 950; }
     .empty, .error {
       padding: 12px;
       border-radius: 9px;
@@ -90,14 +117,25 @@
       font-size: 14px;
     }
     .empty { border: 1px dashed #aaa; color: #555; }
-    .error { border: 1px solid #e29; color: #a00038; font-weight: 700; }
+    .error { border: 1px solid #e29; color: #a00038; font-weight: 750; }
     @media (max-width: 520px) {
-      .wrap { padding: 6px 5px 18px; }
+      .wrap { padding: 7px 5px 18px; }
       .filters { gap: 4px; }
       .filter { grid-template-columns: 1fr 24px; gap: 2px; }
       select { height: 34px; padding: 0 3px; font-size: 11px; border-radius: 7px; }
       .clear { width: 24px; height: 34px; font-size: 16px; border-radius: 7px; }
-      .row { grid-template-columns: 24px 1fr auto; gap: 5px; min-height: 36px; padding: 6px 6px; font-size: 13px; }
+      .row {
+        grid-template-columns: 28px minmax(0, 1fr) 48px;
+        gap: 5px;
+        min-height: 36px;
+        padding: 6px 6px;
+        font-size: 13px;
+      }
+      .combo {
+        width: min(100%, 300px);
+        grid-template-columns: minmax(0, 1fr) 68px;
+        gap: 8px;
+      }
       .stats { font-size: 12px; }
     }
   </style>
@@ -142,12 +180,20 @@
       return String(value ?? "").trim();
     }
 
+    function stripProductCode(value) {
+      return clean(value)
+        .replace(/[\s　]+(?:BXA|BXB|BXC|BXG|BXH|BX|UX|CX)-\d+[A-Za-z0-9_₀₁₂₃₄₅₆₇₈₉]*/gi, "")
+        .replace(/[\s　]{2,}/g, " ")
+        .trim();
+    }
+
     function getFieldValue(row, fieldId) {
       const f = fields[fieldId];
       const main = clean(row[f.key]);
-      if (main) return main;
-      if (f.fallbackKey) return clean(row[f.fallbackKey]);
-      return "";
+      let value = main;
+      if (!value && f.fallbackKey) value = clean(row[f.fallbackKey]);
+      if (fieldId === "blade") return stripProductCode(value);
+      return value;
     }
 
     function isChampion(row) {
@@ -250,6 +296,25 @@
       return `${blade} ${ratchet}${bit}`.trim();
     }
 
+    function highlightedSpan(value, active) {
+      const cls = active ? " class=\"hit\"" : "";
+      return `<span${cls}>${esc(value)}</span>`;
+    }
+
+    function comboHtml(row, state) {
+      const blade = getFieldValue(row, "blade") || "未命名";
+      const ratchet = getFieldValue(row, "ratchet");
+      const bit = getFieldValue(row, "bit");
+      const bladeHit = state.blade && blade === state.blade;
+      const ratchetHit = state.ratchet && ratchet === state.ratchet;
+      const bitHit = state.bit && bit === state.bit;
+
+      return `
+        <div class="blade-name">${highlightedSpan(blade, bladeHit)}</div>
+        <div class="part-code">${highlightedSpan(ratchet, ratchetHit)}${highlightedSpan(bit, bitHit)}</div>
+      `;
+    }
+
     function buildTop10(rows) {
       const map = new Map();
 
@@ -276,6 +341,7 @@
     }
 
     function renderList() {
+      const state = getState();
       const top = buildTop10(filteredRows());
 
       if (!top.length) {
@@ -286,7 +352,7 @@
       listEl.innerHTML = top.map((item, index) => `
         <div class="row">
           <div class="rank">${index + 1}.</div>
-          <div class="combo">${esc(comboText(item.sample))}</div>
+          <div class="combo">${comboHtml(item.sample, state)}</div>
           <div class="stats">🏆${item.first}/${item.total}</div>
         </div>
       `).join("");
